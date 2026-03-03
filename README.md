@@ -4,9 +4,9 @@
 This project applies Genetic Algorithm (GA) optimization to identify optimal geographic locations for nuclear shelters across the United States. The problem is framed as an Uncapacitated Facility Location Problem (UFLP). The objective is to maximize population coverage while ensuring shelters are positioned outside high-risk blast zones (15-mile exclusion radius) and near necessary infrastructure.
 
 ## Team Members
-- [Your Name] - [Student ID]
-- [Partner Name 2] - [Student ID] (If applicable)
-- [Partner Name 3] - [Student ID] (If applicable)
+- Murtaza Nipplewala
+- Aartika Parmar
+- Samyak Shah
 
 ## Project Structure
 - `src/`: Core Python modules.
@@ -27,7 +27,7 @@ The system encodes candidate solutions as binary vectors where each bit represen
 4. **Evaluation**: Compares final GA results against a Greedy Baseline heuristic.
 
 ## Tools and Dependencies
-This project is built in **Python 3.9+**. Key libraries include:
+This project is built in **Python 3.12+**. Key libraries include:
 - `numpy`, `pandas`: Data manipulation.
 - `geopandas`, `shapely`: Spatial data handling.
 - `osmnx`: Road network data.
