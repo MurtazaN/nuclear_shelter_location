@@ -63,7 +63,7 @@ See `requirements.txt` for a full list of dependencies.
 
 ### 1. Environment Setup
 ```bash
-python -m venv venv
+python3.11 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
