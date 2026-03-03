@@ -9,6 +9,30 @@ This project applies Genetic Algorithm (GA) optimization to identify optimal geo
 - Samyak Shah
 
 ## Project Structure
+```
+nuclear_shelter_ga/
+│
+├── data/
+│   ├── raw/               # Raw downloaded data (census, grids, etc.)
+│   └── processed/         # Cleaned CSVs/GeoJSONs
+│
+├── src/
+│   ├── __init__.py
+│   ├── data_loader.py     # Functions to load Census, Power, Road data
+│   ├── fitness.py         # Fitness function (Coverage, Safety, Access)
+│   ├── genetic_algo.py    # GA Class (Select, Crossover, Mutate)
+│   ├── baseline.py        # Greedy heuristic implementation
+│   ├── utils.py           # Helpers (distance calc, plotting)
+│   └── main.py            # Entry point
+│
+├── notebooks/             # Jupyter notebooks for exploration
+│
+├── .gitignore
+├── requirements.txt
+├── README.md
+└── report/                # Drafts of your final paper
+```
+
 - `src/`: Core Python modules.
   - `data_loader.py`: Handles Census, Power Grid, and OSM data ingestion.
   - `fitness.py`: Calculates coverage, safety constraints, and accessibility scores.
@@ -27,7 +51,7 @@ The system encodes candidate solutions as binary vectors where each bit represen
 4. **Evaluation**: Compares final GA results against a Greedy Baseline heuristic.
 
 ## Tools and Dependencies
-This project is built in **Python 3.12+**. Key libraries include:
+This project is built in **Python 3.11+**. Key libraries include:
 - `numpy`, `pandas`: Data manipulation.
 - `geopandas`, `shapely`: Spatial data handling.
 - `osmnx`: Road network data.
@@ -42,3 +66,14 @@ See `requirements.txt` for a full list of dependencies.
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
+```
+
+### 2. Run the Code
+```bash
+python src/main.py
+```
+
+### 3. View Results
+The results will be saved in the `report/` directory.\
+The convergence plot will be saved as `convergence_plot.png`.
+
