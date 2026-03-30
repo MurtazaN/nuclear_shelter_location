@@ -12,13 +12,13 @@ from pathlib import Path
 import pgeocode
 
 # ── Paths ────────────────────────────────────────────────────────────────────
-DATA_DIR = Path(__file__).resolve().parent.parent / "data/raw"
+DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 PROCESSED_DIR = DATA_DIR / "processed"
 
-POP_2000_PATH    = DATA_DIR / "population_by_zip_2000.csv"
-POP_2010_PATH    = DATA_DIR / "population_by_zip_2010.csv"
-TARGETS_PATH     = DATA_DIR / "usa_nuclear_targets.csv"
-URBAN_AREAS_PATH = DATA_DIR / "usa_urban_areas.csv"
+POP_2000_PATH    = DATA_DIR / "raw/population_by_zip_2000.csv"
+POP_2010_PATH    = DATA_DIR / "raw/population_by_zip_2010.csv"
+TARGETS_PATH     = DATA_DIR / "raw/usa_nuclear_targets.csv"
+URBAN_AREAS_PATH = DATA_DIR / "raw/usa_urban_areas.csv"
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────

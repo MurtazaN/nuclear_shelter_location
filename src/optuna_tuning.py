@@ -17,21 +17,20 @@ import os
 import json
 import time
 
-# Ensure parent dir is on path so `src.*` imports work
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 import numpy as np
 import optuna
+
 from optuna.visualization.matplotlib import (
     plot_optimization_history,
     plot_param_importances,
 )
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
 from src.data_loader import load_census_data, load_nuclear_targets, load_urban_areas
-from src.preprocessing import preprocess
+from src.feature_engineering import features
 from src.fitness import FitnessFunction
 from src.genetic_algo import GeneticAlgorithm
 
@@ -61,7 +60,7 @@ def _load_data():
     targets_df = load_nuclear_targets()
     urban_df   = load_urban_areas()
 
-    _PREP = preprocess(census_df, targets_df, urban_df, service_radius=50.0)
+    _PREP = features(census_df, targets_df, urban_df, service_radius=50.0)
 
     _FITNESS_OBJ = FitnessFunction(
         populations=_PREP["populations"],
