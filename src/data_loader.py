@@ -119,6 +119,7 @@ def load_nuclear_targets() -> pd.DataFrame:
 
     df["lat"] = pd.to_numeric(df["lat"], errors="coerce")
     df["lon"] = pd.to_numeric(df["lon"], errors="coerce")
+    # drop na/nulls in lat/lon (can't compute blast zones without coordinates)
     df = df.dropna(subset=["lat", "lon"]).reset_index(drop=True)
 
     # Parse yield and burst type for blast radius calculations
@@ -171,6 +172,7 @@ def load_urban_areas() -> pd.DataFrame:
             break
 
     df = df.rename(columns=col_map)
+    # Ensure lat/lon are numeric and drop rows with invalid coordinates
     df["lat"] = pd.to_numeric(df["lat"], errors="coerce")
     df["lon"] = pd.to_numeric(df["lon"], errors="coerce")
     df = df.dropna(subset=["lat", "lon"]).reset_index(drop=True)
