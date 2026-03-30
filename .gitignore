@@ -11,10 +11,9 @@ __pycache__/
 dist/
 build/
 
-.idea/
-*.egg-info/
+# python virtual environment
 venv/
+nsl_venv/
+
+# remove before final
 results/
-data/processed/
-__pycache__/
-*.pyc
