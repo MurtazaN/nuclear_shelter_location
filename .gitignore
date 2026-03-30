@@ -10,11 +10,3 @@ __pycache__/
 .eggs/
 dist/
 build/
-
-.idea/
-*.egg-info/
-venv/
-results/
-data/processed/
-__pycache__/
-*.pyc

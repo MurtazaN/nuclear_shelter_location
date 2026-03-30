@@ -10,23 +10,23 @@
     "adaptive_mutation": false
   },
   "ga_report": {
-    "n_shelters": 3008,
-    "covered_pop": 16183661,
-    "total_pop": 16205440,
-    "coverage_pct": 99.87,
-    "infra_score": 0.8193,
-    "cost_ratio": 0.099231,
-    "fitness": 0.853005
+    "n_shelters": 2850,
+    "covered_pop": 792869094,
+    "total_pop": 795455400,
+    "coverage_pct": 99.67,
+    "infra_score": 0.8178,
+    "cost_ratio": 0.092081,
+    "fitness": 0.85208
   },
-  "ga_time_sec": 125.0,
+  "ga_time_sec": 77.3,
   "greedy_report": {
-    "n_shelters": 3008,
-    "covered_pop": 16205332,
-    "total_pop": 16205440,
+    "n_shelters": 2850,
+    "covered_pop": 795455400,
+    "total_pop": 795455400,
     "coverage_pct": 100.0,
-    "infra_score": 0.9306,
-    "cost_ratio": 0.099231,
-    "fitness": 0.876201
+    "infra_score": 0.919,
+    "cost_ratio": 0.092081,
+    "fitness": 0.874595
   },
-  "greedy_time_sec": 60.0
+  "greedy_time_sec": 26.5
 }
