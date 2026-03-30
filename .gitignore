@@ -13,4 +13,4 @@ build/
 
 # python virtual environment
 venv/
-ns_venv/
+nsl_venv/
