@@ -1,160 +1,139 @@
 # AI-Optimized Nuclear Shelter Siting (UFLP)
 
 ## Overview
-This project applies Genetic Algorithm (GA) optimization to identify optimal geographic locations for nuclear shelters across the United States. The problem is framed as an Uncapacitated Facility Location Problem (UFLP). The objective is to maximize population coverage while ensuring shelters are positioned outside high-risk blast zones (15-mile exclusion radius) and near necessary infrastructure.
+
+This project applies a Genetic Algorithm (GA) to identify optimal geographic locations for nuclear shelters across the United States. The problem is framed as an Uncapacitated Facility Location Problem (UFLP). The objective is to maximize population coverage while ensuring shelters are positioned outside yield-scaled blast zones derived from the Hopkinson-Cranz cube-root scaling law.
+
+Results are compared against a greedy heuristic baseline. Hyperparameters are tuned using Optuna.
 
 ## Team Members
+
 - Murtaza Nipplewala
 - Aartika Parmar
 - Samyak Shah
 
+---
+
 ## Project Structure
+
 ```
 nuclear_shelter_location/
 │
 ├── data/
-│   ├── raw/               # Raw downloaded data (census, targets, urban areas)
-│   └── processed/         # Cleaned CSVs/GeoJSONs
+│   └── raw/                        # ← Place downloaded data files here
+│       ├── population_by_zip_2000.csv
+│       ├── population_by_zip_2010.csv
+│       ├── us_nuclear_targets.xlsx
+│       └── Urban_Areas.csv
 │
 ├── src/
 │   ├── __init__.py
-│   ├── data_loader.py     # Functions to load Census, Urban Area, Target data
-│   ├── fitness.py         # Fitness function (Coverage, Safety, Access)
-│   ├── genetic_algo.py    # GA Class (Select, Crossover, Mutate)
-│   ├── baseline.py        # Greedy heuristic implementation
-│   ├── utils.py           # Helpers (distance calc, plotting)
-│   └── main.py            # Entry point
+│   ├── data_loader.py              # Loads and preprocesses all datasets
+│   ├── preprocessing.py            # Safety mask, coverage matrix, infra scores
+│   ├── blast_radius.py             # Hopkinson-Cranz blast radius calculations
+│   ├── fitness.py                  # Fitness function (coverage + safety + infra)
+│   ├── genetic_algo.py             # GA (selection, crossover, mutation, elitism)
+│   ├── baseline.py                 # Greedy heuristic baseline
+│   ├── utils.py                    # Haversine distance helpers
+│   ├── main.py                     # Entry point — run this
+│   └── optuna_tuning.py            # Optional: hyperparameter tuning
 │
-├── notebooks/             # Jupyter notebooks for exploration
-│
-├── pyproject.toml         # Project packaging and dependencies
-├── .gitignore
-├── README.md
-└── report/                # Drafts of your final paper
+├── results/                        # Auto-generated outputs (plots, JSON)
+├── requirements.txt
+└── pyproject.toml
 ```
 
-- `src/`: Core Python modules.
-  - `data_loader.py`: Handles Census, Urban Area, Nuclear Target, and OSM data ingestion; includes preprocessing (null removal, deduplication, normalization).
-  - `fitness.py`: Calculates coverage, safety constraints, and accessibility scores.
-  - `genetic_algo.py`: Implements the GA (Selection, Crossover, Mutation).
-  - `baseline.py`: Implements the Greedy Heuristic for comparison.
-  - `main.py`: Entry point for execution.
-- `data/`: Storage for raw and processed datasets.
-- `notebooks/`: Exploratory data analysis and visualization.
-- `report/`: Drafts and final version of the project paper.
-
-## Data Card
-
-### 1. U.S. Population by Zip Code (Census)
-
-| Field | Description |
-|---|---|
-| **Source** | U.S. Census Bureau |
-| **Download** | [Kaggle – US Population by Zip Code](https://www.kaggle.com/datasets/census/us-population-by-zip-code) |
-| **File** | `usa_population_by_zipcode.csv` |
-| **Purpose** | Provides zip-code-level population counts used as demand nodes for shelter coverage calculations. |
-
-| Column | Description |
-|---|---|
-| `zip_code` | 5-digit USPS ZIP Code |
-| `latitude` | Latitude of the ZIP Code centroid |
-| `longitude` | Longitude of the ZIP Code centroid |
-| `population` | Total estimated population within the ZIP Code |
-| `state` | U.S. state the ZIP Code belongs to |
-
-### 2. U.S. Nuclear Targets Database
-
-| Field | Description |
-|---|---|
-| **Source** | Nuclear War Map (Christopher Minson LLC) |
-| **Download** | [Nuclear War Map – Target List](https://www.nuclearwarmap.com/targetlist.html) |
-| **File** | `usa_nuclear_targets.csv` |
-| **Purpose** | Lists potential nuclear strike targets; used to define the 15-mile exclusion (blast zone) radius around each target. ZIP Codes within this radius are excluded as candidate shelter sites. |
-
-| Column | Description |
-|---|---|
-| `State` | U.S. state where the target is located |
-| `Target` | Name of the target (e.g., city, military base, airport) |
-| `Category` | Target classification: Military, Economic, Government, or Transportation |
-| `Lat` | Latitude of the target |
-| `Lng` | Longitude of the target |
-| `Yield` | Estimated warhead yield (e.g., 500kt, 1000kt) |
-| `Type` | Detonation type: Air Burst or Surface Burst |
-
-### 3. United States Urban Areas Dataset
-
-| Field | Description |
-|---|---|
-| **Source** | The Devastator (Kaggle) |
-| **Download** | [Kaggle – United States Urban Areas Dataset](https://www.kaggle.com/datasets/thedevastator/united-states-urban-areas-dataset?resource=download) |
-| **File** | `usa_urban_areas.csv` |
-| **Purpose** | Provides population density and geographic extent of U.S. urban areas; used for infrastructure accessibility scoring and population density weighting. |
-
-| Column | Description |
-|---|---|
-| `Name` | Name of the urban area |
-| `State` | U.S. state(s) the urban area spans |
-| `Land Area (sq mi)` | Total land area in square miles |
-| `Population` | Total population of the urban area |
-| `Population Density` | People per square mile |
-| `Latitude` | Latitude of the urban area centroid |
-| `Longitude` | Longitude of the urban area centroid |
-
-### 4. Road Network Data (OSMnx)
-
-| Field | Description |
-|---|---|
-| **Source** | OpenStreetMap via the OSMnx Python library |
-| **Download** | Fetched programmatically using `osmnx` (no static download link) |
-| **Purpose** | Provides U.S. road/transport network graph data for infrastructure accessibility scoring. Proximity to major roads is a factor in the fitness function. |
-
-| Attribute | Description |
-|---|---|
-| `osmid` | Unique OpenStreetMap feature ID |
-| `highway` | Road classification (motorway, primary, secondary, etc.) |
-| `geometry` | Shapely LineString geometry of the road segment |
-| `length` | Length of the road segment in meters |
-
-## Brief Explanation of Code
-The system encodes candidate solutions as binary vectors where each bit represents a US Zip Code (1 = Shelter, 0 = No Shelter).
-1. **Initialization**: Generates random populations, masking out unsafe zones (within 15 miles of urban targets).
-2. **Fitness Function**: Evaluates solutions based on total population covered within a service radius, penalizes unsafe placements, and rewards proximity to road infrastructure and urban areas.
-3. **Evolution**: Uses tournament selection, uniform crossover, and bit-flip mutation to evolve solutions over generations.
-4. **Evaluation**: Compares final GA results against a Greedy Baseline heuristic.
-
-## Tools and Dependencies
-This project is built in **Python 3.11+** and packaged with **setuptools** via `pyproject.toml`. Key libraries include:
-- `numpy`, `pandas`: Data manipulation.
-- `geopandas`, `shapely`: Spatial data handling.
-- `osmnx`: Road network data.
-- `matplotlib`: Visualization.
-
-See `pyproject.toml` for the full list of dependencies.
+---
 
 ## Setup and Run
 
-### 1. Environment Setup
-```bash
-python3.11 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+### Step 1 — Clone the repository
 
-# Install the project and all dependencies
+```bash
+git clone https://github.com/MurtazaN/nuclear_shelter_location.git
+cd nuclear_shelter_location
+```
+
+### Step 2 — Download the data
+
+Download all four data files from Google Drive:
+
+📁 **[Download Data Files](https://drive.google.com/drive/folders/1WEe_0riT-9PBuILeSj9PrpZ-Qqmdha4D?usp=sharing)**
+
+Place them in the `data/raw/` directory. Create the folder if it doesn't exist:
+
+```
+data/raw/population_by_zip_2000.csv
+data/raw/population_by_zip_2010.csv
+data/raw/us_nuclear_targets.xlsx
+data/raw/Urban_Areas.csv
+```
+
+### Step 3 — Create and activate a virtual environment
+
+```bash
+python -m venv venv
+
+# macOS / Linux
+source venv/bin/activate
+
+# Windows
+venv\Scripts\activate
+```
+
+### Step 4 — Install dependencies
+
+```bash
 pip install -e .
 ```
 
-### 2. Prepare Data
-Place the raw CSV files in the `data/raw/` directory:
-- `usa_population_by_zipcode.csv`
-- `usa_nuclear_targets.csv`
-- `usa_urban_areas.csv`
+### Step 5 — Run the optimizer
 
-Road network data is fetched programmatically via OSMnx at runtime.
-
-### 3. Run the Code
 ```bash
 python src/main.py
 ```
 
-### 4. View Results
-The results will be saved in the `report/` directory.\
-The convergence plot will be saved as `convergence_plot.png`.
+Results (plots, convergence data, comparison JSON) will be saved to the `results/` directory.
+
+---
+
+## Optional: Hyperparameter Tuning with Optuna
+
+To run Optuna tuning before the main run:
+
+```bash
+python src/optuna_tuning.py --n-trials 30
+```
+
+This saves the best parameters to `results/optuna_best_params.json`, which `main.py` automatically loads on the next run. If no tuning has been run, `main.py` falls back to default parameters.
+
+---
+
+## Methodology
+
+Candidate solutions are encoded as binary vectors over ~30,000 U.S. ZIP codes (1 = shelter placed, 0 = no shelter). Unsafe ZIP codes within the yield-scaled blast radius of any nuclear target are masked out before the GA begins.
+
+**Fitness Function:**
+```
+Fitness = 0.7 × (covered_population / total_population)
+        + 0.2 × mean_infrastructure_score
+        - 0.1 × (num_shelters / total_candidates)
+```
+
+**GA operators:** tournament selection, uniform crossover, bit-flip mutation, elitism, adaptive mutation rate with stagnation detection.
+
+---
+
+## Data Sources
+
+| Dataset | Source |
+|---|---|
+| U.S. ZIP-level population (2000, 2010) | U.S. Census Bureau |
+| U.S. Nuclear Targets (1,087 targets) | Nuclear War Map (Christopher Minson LLC) |
+| U.S. Urban Areas (3,601 areas) | The Devastator (Kaggle) |
+
+---
+
+## Dependencies
+
+See `requirements.txt`. Key libraries: `numpy`, `pandas`, `scipy`, `geopandas`, `pgeocode`, `matplotlib`, `optuna`, `tqdm`, `openpyxl`.

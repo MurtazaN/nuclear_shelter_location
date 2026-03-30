@@ -15,10 +15,10 @@ import pgeocode
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 PROCESSED_DIR = DATA_DIR / "processed"
 
-POP_2000_PATH    = DATA_DIR / "population_by_zip_2000.csv"
-POP_2010_PATH    = DATA_DIR / "population_by_zip_2010.csv"
-TARGETS_PATH     = DATA_DIR / "us_nuclear_targets.xlsx"
-URBAN_AREAS_PATH = DATA_DIR / "Urban_Areas.csv"
+POP_2000_PATH    = DATA_DIR / "raw" / "population_by_zip_2000.csv"
+POP_2010_PATH    = DATA_DIR / "raw" /"population_by_zip_2010.csv"
+TARGETS_PATH     = DATA_DIR / "raw" /"us_nuclear_targets.xlsx"
+URBAN_AREAS_PATH = DATA_DIR / "raw"/ "Urban_Areas.csv"
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -32,18 +32,6 @@ def _normalise_cols(df: pd.DataFrame) -> pd.DataFrame:
 # ── Public loaders ───────────────────────────────────────────────────────────
 
 def load_census_data(use_cache: bool = True) -> pd.DataFrame:
-    """
-    Loads 2010 ZIP-level population data, aggregates across age/gender rows,
-    and attaches lat/lon coordinates via pgeocode.
-
-    Returns
-    -------
-    DataFrame with columns:
-        zip_code   (str, zero-padded 5-digit)
-        population (int, total population in that ZIP)
-        lat        (float)
-        lon        (float)
-    """
     cache_path = PROCESSED_DIR / "census_processed.csv"
     if use_cache and cache_path.exists():
         print("Loading Census Data from cache...")
@@ -53,9 +41,14 @@ def load_census_data(use_cache: bool = True) -> pd.DataFrame:
 
     print("Loading Census Data (this may take a minute on first run)...")
 
-    # ── Read raw 2010 data ──
-    raw = pd.read_csv(POP_2010_PATH, dtype=str)
-    raw.columns = raw.columns.str.strip().str.lower()
+    # ── Read raw data, use 2010 as primary, fill missing ZIPs from 2000 ──
+    raw_2010 = pd.read_csv(POP_2010_PATH, dtype=str)
+    raw_2000 = pd.read_csv(POP_2000_PATH, dtype=str)
+
+    raw_2010.columns = raw_2010.columns.str.strip().str.lower()
+    raw_2000.columns = raw_2000.columns.str.strip().str.lower()
+
+    raw = pd.concat([raw_2010, raw_2000]).drop_duplicates(subset="zipcode", keep="first")
 
     raw["population"] = pd.to_numeric(raw["population"], errors="coerce")
     raw["zipcode"] = raw["zipcode"].str.strip().str.zfill(5)
