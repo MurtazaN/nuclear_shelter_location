@@ -166,7 +166,7 @@ def main():
     urban_df   = load_urban_areas()
 
     # ── 2. Preprocess ──
-    prep = preprocess(census_df, targets_df, urban_df, service_radius=50.0)
+    prep = features(census_df, targets_df, urban_df, service_radius=50.0)
 
     # ── 3. Create Fitness Function ──
     fitness_obj = FitnessFunction(
