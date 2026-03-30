@@ -18,7 +18,7 @@
     "cost_ratio": 0.092081,
     "fitness": 0.85208
   },
-  "ga_time_sec": 77.3,
+  "ga_time_sec": 137.0,
   "greedy_report": {
     "n_shelters": 2850,
     "covered_pop": 795455400,
@@ -28,5 +28,5 @@
     "cost_ratio": 0.092081,
     "fitness": 0.874595
   },
-  "greedy_time_sec": 26.5
+  "greedy_time_sec": 53.4
 }
