@@ -6,11 +6,12 @@ sparse coverage matrix.
 
 import numpy as np
 import pandas as pd
-from src.utils import haversine_distance_matrix
+from scipy import sparse
+from src.haversine_helpers import haversine_distance_matrix
 from src.blast_radius import blast_radius_miles
 
 
-def compute_safety_mask(zip_lats, zip_lons,
+def compute_blast_based_safety_mask(zip_lats, zip_lons,
                         target_lats, target_lons,
                         target_yields_kt, target_burst_types,
                         threshold="5psi"):
@@ -33,11 +34,11 @@ def compute_safety_mask(zip_lats, zip_lons,
     print(f"    Blast radii range: {radii.min():.2f} – {radii.max():.2f} miles")
 
     # Distance matrix: (N_zips, N_targets)
-    dist = haversine_distance_matrix(zip_lats, zip_lons, target_lats, target_lons)
+    distance_matrix = haversine_distance_matrix(zip_lats, zip_lons, target_lats, target_lons)
 
     # A zip is unsafe if its distance to ANY target < that target's blast radius
     # dist[i, j] < radii[j]  →  broadcast radii as (1, M)
-    inside_blast = dist < radii[None, :]   # (N_zips, N_targets)
+    inside_blast = distance_matrix < radii[None, :]   # (N_zips, N_targets)
     mask = ~inside_blast.any(axis=1)       # safe = not inside any blast zone
 
     n_unsafe = (~mask).sum()
@@ -46,7 +47,7 @@ def compute_safety_mask(zip_lats, zip_lons,
     return mask
 
 
-def compute_infrastructure_scores(zip_lats, zip_lons, urban_lats, urban_lons,
+def compute_infrastructure_proximity_scores(zip_lats, zip_lons, urban_lats, urban_lons,
                                   decay_miles=50.0):
     """
     Compute an infrastructure proximity score for each ZIP code in [0, 1].
@@ -56,12 +57,11 @@ def compute_infrastructure_scores(zip_lats, zip_lons, urban_lats, urban_lons,
     print("  Computing infrastructure accessibility scores...")
 
     # Distance matrix: (N_zips, N_urban)
-    dist = haversine_distance_matrix(zip_lats, zip_lons, urban_lats, urban_lons)
+    distance_matrix = haversine_distance_matrix(zip_lats, zip_lons, urban_lats, urban_lons)
     # Exponential decay — closest urban area dominates
-    scores = np.exp(-dist / decay_miles).max(axis=1)
-    print(f"    Score range: [{scores.min():.4f}, {scores.max():.4f}]")
-    return scores
-
+    infra_prox_scores = np.exp(-distance_matrix / decay_miles).max(axis=1)
+    print(f"    Score range: [{infra_prox_scores.min():.4f}, {infra_prox_scores.max():.4f}]")
+    return infra_prox_scores
 
 def compute_coverage_distances(zip_lats, zip_lons, service_radius_miles=50.0):
     """
@@ -70,7 +70,7 @@ def compute_coverage_distances(zip_lats, zip_lons, service_radius_miles=50.0):
 
     Processes in chunks to avoid memory blow-up for ~30K+ zip codes.
     """
-    from scipy import sparse
+
 
     n = len(zip_lats)
     print(f"  Building coverage adjacency (N={n:,}, radius={service_radius_miles} mi)...")
@@ -101,7 +101,7 @@ def compute_coverage_distances(zip_lats, zip_lons, service_radius_miles=50.0):
     return coverage
 
 
-def preprocess(census_df, targets_df, urban_df, service_radius=50.0,
+def features(census_df, targets_df, urban_df, service_radius=50.0,
                blast_threshold="5psi"):
     """
     Master preprocessing function.
@@ -124,7 +124,7 @@ def preprocess(census_df, targets_df, urban_df, service_radius=50.0,
         coverage_matrix : sparse bool matrix (safe-zip × safe-zip)
         n_genes         : int (number of candidate sites = safe zips)
     """
-    print("\n=== PREPROCESSING ===")
+    print("\n=== Feature Engineering ===")
 
     zip_lats = census_df["lat"].values.astype(np.float64)
     zip_lons = census_df["lon"].values.astype(np.float64)
@@ -138,7 +138,7 @@ def preprocess(census_df, targets_df, urban_df, service_radius=50.0,
     urban_lons = urban_df["lon"].values.astype(np.float64)
 
     # 1. Safety mask (yield-scaled per target)
-    safety_mask = compute_safety_mask(
+    safety_mask = compute_blast_based_safety_mask(
         zip_lats, zip_lons,
         target_lats, target_lons,
         target_yields, target_burst_types,
@@ -152,7 +152,7 @@ def preprocess(census_df, targets_df, urban_df, service_radius=50.0,
     populations = safe_df["population"].values.astype(np.float64)
 
     # 3. Infrastructure scores for safe zips
-    infra_scores = compute_infrastructure_scores(safe_lats, safe_lons,
+    infra_scores = compute_infrastructure_proximity_scores(safe_lats, safe_lons,
                                                  urban_lats, urban_lons)
 
     # 4. Coverage adjacency matrix (among safe zips)
