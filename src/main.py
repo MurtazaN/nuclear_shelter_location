@@ -259,16 +259,28 @@ def main():
     plot_shelter_map(prep["zip_codes"], best_sol,
                      os.path.join(RESULTS_DIR, "shelter_map.png"))
 
-    # Save final results JSON
-    final_results = {
-        "ga_params": params,
-        "ga_report": ga_report,
-        "ga_time_sec": round(ga_elapsed, 1),
-        "greedy_report": greedy_report,
-        "greedy_time_sec": round(greedy_elapsed, 1),
-    }
-    with open(os.path.join(RESULTS_DIR, "final_results.json"), "w") as f:
-        json.dump(final_results, f, indent=2)
+    # Save final results as markdown
+    final_results_path = os.path.join(RESULTS_DIR, "final_results.md")
+    with open(final_results_path, "w") as f:
+        f.write("# Final Results\n\n")
+
+        f.write("## GA Parameters\n\n")
+        f.write("| Parameter | Value |\n")
+        f.write("|-----------|-------|\n")
+        for k, v in params.items():
+            f.write(f"| {k} | {v} |\n")
+
+        f.write(f"\n## GA Performance\n\n**Time:** {round(ga_elapsed, 1)}s\n\n")
+        f.write("| Metric | Value |\n")
+        f.write("|--------|-------|\n")
+        for k, v in ga_report.items():
+            f.write(f"| {k} | {v} |\n")
+
+        f.write(f"\n## Greedy Baseline\n\n**Time:** {round(greedy_elapsed, 1)}s\n\n")
+        f.write("| Metric | Value |\n")
+        f.write("|--------|-------|\n")
+        for k, v in greedy_report.items():
+            f.write(f"| {k} | {v} |\n")
 
     # Convergence CSV
     conv_df = pd.DataFrame({

@@ -6,15 +6,13 @@ Run separately from main.py:
 
 Saves:
   - results/optuna_study.db          (SQLite study for resume/analysis)
-  - results/optuna_best_params.json  (best hyperparameters)
-  - results/optuna_report.txt        (human-readable summary)
+  - results/optuna_report.md         (human-readable Markdown summary)
   - results/optuna_importance.png    (hyperparameter importance plot)
   - results/optuna_history.png       (optimisation history plot)
 """
 
 import sys
 import os
-import json
 import time
 
 import numpy as np
@@ -167,46 +165,41 @@ def run_tuning(n_trials: int = 30, study_name: str = "ga_uflp_optuna"):
         print(f"    {k}: {v}")
     print(f"\n  Total time: {elapsed:.1f}s ({elapsed/60:.1f} min)")
 
-    # ── Save best params ──
-    best_params_path = os.path.join(RESULTS_DIR, "optuna_best_params.json")
-    with open(best_params_path, "w") as f:
-        json.dump({
-            "best_fitness": best.value,
-            "best_params": best.params,
-            "coverage_pct": best.user_attrs.get("coverage_pct"),
-            "n_shelters": best.user_attrs.get("n_shelters"),
-            "infra_score": best.user_attrs.get("infra_score"),
-            "n_trials": len(study.trials),
-        }, f, indent=2)
-    print(f"  Saved best params -> {best_params_path}")
-
-    # ── Save human-readable report ──
-    report_path = os.path.join(RESULTS_DIR, "optuna_report.txt")
+    # ── Save human-readable Markdown report ──
+    report_path = os.path.join(RESULTS_DIR, "optuna_report.md")
     with open(report_path, "w") as f:
-        f.write("OPTUNA HYPERPARAMETER TUNING REPORT\n")
-        f.write("=" * 50 + "\n\n")
-        f.write(f"Study:         {study_name}\n")
-        f.write(f"Total trials:  {len(study.trials)}\n")
-        f.write(f"Total time:    {elapsed:.1f}s\n\n")
-        f.write(f"BEST TRIAL (#{best.number})\n")
-        f.write(f"  Fitness:    {best.value:.6f}\n")
-        f.write(f"  Coverage:   {best.user_attrs.get('coverage_pct', '?')}%\n")
-        f.write(f"  Shelters:   {best.user_attrs.get('n_shelters', '?')}\n")
-        f.write(f"  Infra:      {best.user_attrs.get('infra_score', '?')}\n\n")
-        f.write("  Parameters:\n")
-        for k, v in best.params.items():
-            f.write(f"    {k}: {v}\n")
+        f.write("# Optuna Hyperparameter Tuning Report\n\n")
+        f.write("| Property | Value |\n")
+        f.write("|----------|-------|\n")
+        f.write(f"| Study | {study_name} |\n")
+        f.write(f"| Total Trials | {len(study.trials)} |\n")
+        f.write(f"| Total Time | {elapsed:.1f}s |\n\n")
 
-        f.write(f"\n\nALL TRIALS (sorted by fitness):\n")
-        f.write("-" * 50 + "\n")
+        f.write(f"## Best Trial (#{best.number})\n\n")
+        f.write("| Metric | Value |\n")
+        f.write("|--------|-------|\n")
+        f.write(f"| Fitness | {best.value:.6f} |\n")
+        f.write(f"| Coverage | {best.user_attrs.get('coverage_pct', '?')}% |\n")
+        f.write(f"| Shelters | {best.user_attrs.get('n_shelters', '?')} |\n")
+        f.write(f"| Infra Score | {best.user_attrs.get('infra_score', '?')} |\n\n")
+
+        f.write("### Parameters\n\n")
+        f.write("| Parameter | Value |\n")
+        f.write("|-----------|-------|\n")
+        for k, v in best.params.items():
+            f.write(f"| {k} | {v} |\n")
+
+        f.write("\n## All Trials (sorted by fitness)\n\n")
+        f.write("| Trial | Fitness | Coverage | Parameters |\n")
+        f.write("|-------|---------|----------|------------|\n")
         sorted_trials = sorted(study.trials,
                                 key=lambda t: t.value if t.value is not None else -999,
                                 reverse=True)
         for t in sorted_trials:
             val = f"{t.value:.6f}" if t.value is not None else "FAILED"
             cov = t.user_attrs.get("coverage_pct", "?")
-            f.write(f"  Trial {t.number:>3}: fitness={val}  "
-                    f"cov={cov}%  params={t.params}\n")
+            params_str = ", ".join(f"{k}={v}" for k, v in t.params.items())
+            f.write(f"| {t.number} | {val} | {cov}% | {params_str} |\n")
 
     print(f"  Saved report -> {report_path}")
 
