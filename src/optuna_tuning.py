@@ -29,7 +29,11 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from src.data_loader import load_census_data, load_nuclear_targets, load_urban_areas
+from src.data_loader import (
+    load_processed_census_data,
+    load_processed_nuclear_targets_data,
+    load_processed_urban_areas_data,
+)
 from src.feature_engineering import features
 from src.fitness import FitnessFunction
 from src.genetic_algo import GeneticAlgorithm
@@ -64,11 +68,16 @@ def _load_data():
     print("  Loading & preprocessing data for Optuna study...")
     print("=" * 60)
 
-    census_df  = load_census_data()
-    targets_df = load_nuclear_targets()
-    urban_df   = load_urban_areas()
+    census_processed_df = load_processed_census_data()
+    targets_processed_df = load_processed_nuclear_targets_data()
+    urban_areas_processed_df = load_processed_urban_areas_data()
 
-    _PREP = features(census_df, targets_df, urban_df, service_radius=50.0)
+    _PREP = features(
+        census_processed_df,
+        targets_processed_df,
+        urban_areas_processed_df,
+        service_radius=50.0,
+    )
 
     _FITNESS_OBJ = FitnessFunction(
         populations=_PREP["populations"],
