@@ -11,22 +11,22 @@
   },
   "ga_report": {
     "n_shelters": 319,
-    "covered_pop": 777105651,
-    "total_pop": 795455400,
-    "coverage_pct": 97.69,
-    "infra_score": 0.8528,
+    "covered_pop": 258737147,
+    "total_pop": 265151800,
+    "coverage_pct": 97.58,
+    "infra_score": 0.856,
     "cost_ratio": 0.010307,
-    "fitness": 0.853378
+    "fitness": 0.853226
   },
-  "ga_time_sec": 83.4,
+  "ga_time_sec": 88.0,
   "greedy_report": {
     "n_shelters": 319,
-    "covered_pop": 780167478,
-    "total_pop": 795455400,
+    "covered_pop": 260055826,
+    "total_pop": 265151800,
     "coverage_pct": 98.08,
     "infra_score": 0.817,
     "cost_ratio": 0.010307,
     "fitness": 0.848908
   },
-  "greedy_time_sec": 2.9
+  "greedy_time_sec": 3.1
 }

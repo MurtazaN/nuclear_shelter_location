@@ -1,0 +1,72 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\providecommand\HyField@AuxAddToFields[1]{}
+\providecommand\HyField@AuxAddToCoFields[2]{}
+\citation{cornuejols1990}
+\citation{holland1992}
+\citation{jaramillo2002}
+\@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
+\citation{glasstone1977}
+\citation{kaggle_census}
+\citation{pgeocode}
+\citation{nuclearwarmap}
+\citation{kaggle_urban}
+\citation{glasstone1977}
+\@writefile{toc}{\contentsline {section}{\numberline {2}Methods}{3}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1}Data Sources}{3}{subsection.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Problem Formulation}{3}{subsection.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1}Blast Zone Exclusion}{4}{subsubsection.2.2.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.2}Coverage Model}{4}{subsubsection.2.2.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.3}Fitness Function}{4}{subsubsection.2.2.3}\protected@file@percent }
+\newlabel{eq:fitness}{{2}{4}{Fitness Function}{equation.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Genetic Algorithm}{5}{subsection.2.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.1}Chromosome Encoding and Fixed-K Constraint}{5}{subsubsection.2.3.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.2}Population Initialization and Greedy Seeding}{5}{subsubsection.2.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.3}Selection}{5}{subsubsection.2.3.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.4}Crossover}{6}{subsubsection.2.3.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.5}Mutation}{6}{subsubsection.2.3.5}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.6}Elitism}{6}{subsubsection.2.3.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.7}Local Search (Memetic Component)}{6}{subsubsection.2.3.7}\protected@file@percent }
+\citation{optuna2019}
+\@writefile{toc}{\contentsline {subsubsection}{\numberline {2.3.8}Adaptive Mutation Rate}{7}{subsubsection.2.3.8}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Greedy Heuristic Baseline}{7}{subsection.2.4}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.5}Hyperparameter Tuning with Optuna}{7}{subsection.2.5}\protected@file@percent }
+\citation{numpy2020}
+\citation{scipy2020}
+\citation{pandas2020}
+\citation{matplotlib2007}
+\citation{pgeocode}
+\citation{optuna2019}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.6}Software and Implementation}{8}{subsection.2.6}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Results}{8}{section.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Hyperparameter Tuning Results}{8}{subsection.3.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Optuna hyperparameter tuning results across five trials.}}{8}{table.caption.1}\protected@file@percent }
+\providecommand*\caption@xref[2]{\@setref\relax\@undefined{#1}}
+\newlabel{tab:optuna}{{1}{8}{Optuna hyperparameter tuning results across five trials}{table.caption.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}GA vs.\ Greedy Baseline Comparison}{9}{subsection.3.2}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Final comparison of the memetic GA and greedy heuristic baseline, both constrained to 319 shelters.}}{9}{table.caption.2}\protected@file@percent }
+\newlabel{tab:comparison}{{2}{9}{Final comparison of the memetic GA and greedy heuristic baseline, both constrained to 319 shelters}{table.caption.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Comparison of GA and greedy baseline on coverage percentage, infrastructure score, and composite fitness.}}{10}{figure.caption.3}\protected@file@percent }
+\newlabel{fig:comparison}{{1}{10}{Comparison of GA and greedy baseline on coverage percentage, infrastructure score, and composite fitness}{figure.caption.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Convergence Behavior}{10}{subsection.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Convergence of the GA over 220 generations. Left: best fitness per generation. Right: average population fitness per generation.}}{11}{figure.caption.4}\protected@file@percent }
+\newlabel{fig:convergence}{{2}{11}{Convergence of the GA over 220 generations. Left: best fitness per generation. Right: average population fitness per generation}{figure.caption.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.4}Geographic Distribution of Shelters}{11}{subsection.3.4}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Geographic distribution of 319 shelters (red triangles) selected by the GA, with all candidate ZIP codes shown in gray.}}{12}{figure.caption.5}\protected@file@percent }
+\newlabel{fig:map}{{3}{12}{Geographic distribution of 319 shelters (red triangles) selected by the GA, with all candidate ZIP codes shown in gray}{figure.caption.5}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Conclusions}{12}{section.4}\protected@file@percent }
+\bibcite{cornuejols1990}{{1}{}{{}}{{}}}
+\bibcite{holland1992}{{2}{}{{}}{{}}}
+\bibcite{jaramillo2002}{{3}{}{{}}{{}}}
+\bibcite{glasstone1977}{{4}{}{{}}{{}}}
+\bibcite{optuna2019}{{5}{}{{}}{{}}}
+\bibcite{kaggle_census}{{6}{}{{}}{{}}}
+\bibcite{nuclearwarmap}{{7}{}{{}}{{}}}
+\bibcite{kaggle_urban}{{8}{}{{}}{{}}}
+\bibcite{numpy2020}{{9}{}{{}}{{}}}
+\bibcite{scipy2020}{{10}{}{{}}{{}}}
+\bibcite{pandas2020}{{11}{}{{}}{{}}}
+\bibcite{matplotlib2007}{{12}{}{{}}{{}}}
+\bibcite{pgeocode}{{13}{}{{}}{{}}}
+\providecommand\NAT@force@numbers{}\NAT@force@numbers
+\gdef \@abspage@last{15}

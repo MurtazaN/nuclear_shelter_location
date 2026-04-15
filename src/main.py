@@ -21,7 +21,12 @@ import matplotlib.pyplot as plt
 # Ensure 'src' is importable when running as `python src/main.py`
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from src.data_loader import load_census_data, load_nuclear_targets, load_urban_areas
+from src.data_loader import (
+    load_raw_census_data,
+    load_raw_nuclear_targets_data,
+    load_raw_urban_areas_data,
+)
+from src.preprocessing import clean_census_data, clean_nuclear_targets, clean_urban_areas
 from src.feature_engineering import features
 from src.fitness import FitnessFunction
 from src.genetic_algo import GeneticAlgorithm
@@ -167,22 +172,32 @@ def plot_shelter_map(zip_df, best_chromosome, path):
 
 def main():
     print("=" * 60)
-    print("   NUCLEAR SHELTER LOCATION OPTIMIZER (UFLP)")
+    print("   NUCLEAR SHELTER LOCATION OPTIMIZER")
     print("=" * 60)
 
     # ── 1. Load Data ──
-    census_df  = load_census_data()
-    targets_df = load_nuclear_targets()
-    urban_df   = load_urban_areas()
+    census_raw_df = load_raw_census_data()
+    targets_raw_df = load_raw_nuclear_targets_data()
+    urban_areas_raw_df = load_raw_urban_areas_data()
 
     # ── 2. Preprocess ──
-    prep = features(census_df, targets_df, urban_df, service_radius=50.0)
+    census_processed_df = clean_census_data(census_raw_df)
+    targets_processed_df = clean_nuclear_targets(targets_raw_df)
+    urban_areas_processed_df = clean_urban_areas(urban_areas_raw_df)
 
-    # ── 3. Create Fitness Function ──
+    # ── 3. Feature Engineering ──
+    featured_data = features(
+        census_processed_df,
+        targets_processed_df,
+        urban_areas_processed_df,
+        service_radius=50.0,
+    )
+
+    # ── 4. Create Fitness Function ──
     fitness_obj = FitnessFunction(
-        populations=prep["populations"],
-        coverage_matrix=prep["coverage_matrix"],
-        infra_scores=prep["infra_scores"],
+        populations=featured_data["populations"],
+        coverage_matrix=featured_data["coverage_matrix"],
+        infra_scores=featured_data["infra_scores"],
         w_cov=0.7,
         w_infra=0.2,
         w_cost=0.1,
@@ -200,15 +215,15 @@ def main():
     print("=" * 60)
 
     target_ratio = params.get("target_shelter_ratio", 0.01)
-    fixed_k = ratio_to_fixed_k(prep["n_genes"], target_ratio)
+    fixed_k = ratio_to_fixed_k(featured_data["n_genes"], target_ratio)
     print(f"  Fixed-K budget: {fixed_k} shelters ({target_ratio:.4%} of candidates)")
 
     print("  Building greedy seed solution for GA initialisation...")
     seed_t0 = time.time()
     greedy_seed_sol, _ = greedy_heuristic(
-        prep["populations"],
-        prep["coverage_matrix"],
-        prep["infra_scores"],
+        featured_data["populations"],
+        featured_data["coverage_matrix"],
+        featured_data["infra_scores"],
         max_shelters=fixed_k,
     )
     greedy_seed_elapsed = time.time() - seed_t0
@@ -231,7 +246,7 @@ def main():
 
     t0 = time.time()
     ga = GeneticAlgorithm(
-        n_genes=prep["n_genes"],
+        n_genes=featured_data["n_genes"],
         fitness_func=fitness_obj.evaluate,
         pop_size=ga_config["pop_size"],
         generations=ga_config["generations"],
@@ -266,9 +281,9 @@ def main():
     else:
         t0 = time.time()
         greedy_sol, _greedy_fit = greedy_heuristic(
-            prep["populations"],
-            prep["coverage_matrix"],
-            prep["infra_scores"],
+            featured_data["populations"],
+            featured_data["coverage_matrix"],
+            featured_data["infra_scores"],
             max_shelters=max_shelters_greedy,
         )
         greedy_elapsed = time.time() - t0
@@ -307,7 +322,7 @@ def main():
                      os.path.join(RESULTS_DIR, "convergence_plot.png"))
     plot_comparison(ga_report, greedy_report,
                     os.path.join(RESULTS_DIR, "comparison_plot.png"))
-    plot_shelter_map(prep["zip_codes"], best_sol,
+    plot_shelter_map(featured_data["zip_codes"], best_sol,
                      os.path.join(RESULTS_DIR, "shelter_map.png"))
 
     # Save final results JSON
